@@ -9,8 +9,11 @@ const {
 } = require('../controllers/bookController');
 const { protect } = require('../middleware/authMiddleware');
 
-// All book routes are protected with JWT
-router.route('/').get(protect, getBooks).post(protect, createBook);
-router.route('/:id').get(protect, getBookById).put(protect, updateBook).delete(protect, deleteBook);
+// Book routes (all protected by JWT middleware)
+router.get('/', protect, getBooks);
+router.post('/', protect, createBook);
+router.get('/:id', protect, getBookById);
+router.put('/:id', protect, updateBook);
+router.delete('/:id', protect, deleteBook);
 
 module.exports = router;
