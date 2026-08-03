@@ -36,6 +36,8 @@ const registerUser = async (req, res) => {
       res.cookie('token', token, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: process.env.NODE_ENV === 'production',
       });
 
       res.status(201).json({
@@ -70,6 +72,8 @@ const loginUser = async (req, res) => {
       res.cookie('token', token, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: process.env.NODE_ENV === 'production',
       });
 
       res.status(200).json({
@@ -90,7 +94,12 @@ const loginUser = async (req, res) => {
 
 const logoutUser = async (req, res) => {
   try {
-    res.cookie('token', null, { expires: new Date(Date.now()) });
+    res.cookie('token', '', {
+      expires: new Date(0),
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    });
     res.status(200).send('Logged out successfully');
   } catch (error) {
     res.status(500).send('Error: ' + error.message);
