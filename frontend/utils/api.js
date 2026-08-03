@@ -1,40 +1,22 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api",
+  // Keep auth requests same-origin in the browser. Next.js proxies /api to the backend.
+  baseURL: "/api",
   withCredentials: true,
-});
-
-API.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-  return config;
 });
 
 export const loginUser = async (email, password) => {
   const { data } = await API.post("/auth/login", { email, password });
-  if (data.token && typeof window !== "undefined") {
-    localStorage.setItem("token", data.token);
-  }
   return data;
 };
 
 export const registerUser = async (name, email, password) => {
   const { data } = await API.post("/auth/register", { name, email, password });
-  if (data.token && typeof window !== "undefined") {
-    localStorage.setItem("token", data.token);
-  }
   return data;
 };
 
 export const logoutUser = async () => {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("token");
-  }
   const { data } = await API.post("/auth/logout");
   return data;
 };
