@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 import { Edit3, Trash2, Tag } from "lucide-react";
 
-export default function BookCard({ book, onEdit, onDelete, onStatusChange }) {
+export default function BookCard({ book, onEdit, onDelete, onStatusChange, onCardClick }) {
   const getStatusBadgeStyle = (status) => {
     switch (status) {
       case "Completed":
@@ -19,16 +19,21 @@ export default function BookCard({ book, onEdit, onDelete, onStatusChange }) {
     <motion.div
       whileHover={{ y: -5, scale: 1.01 }}
       transition={{ duration: 0.2 }}
-      className="group relative overflow-hidden border border-[#E2DDD0] bg-white p-5 rounded-2xl shadow-sm transition hover:border-[#062C19]/30 hover:shadow-md flex flex-col justify-between space-y-4"
+      onClick={() => onCardClick && onCardClick(book)}
+      className="group relative overflow-hidden border border-[#E2DDD0] bg-white p-5 rounded-2xl shadow-xs transition hover:border-[#062C19]/30 hover:shadow-md flex flex-col justify-between space-y-4 cursor-pointer"
     >
       <div className="relative space-y-3">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-extrabold text-lg text-[#062C19] leading-snug line-clamp-2">
+          <h3 className="font-extrabold text-lg text-[#062C19] leading-snug line-clamp-2 group-hover:text-emerald-950 transition">
             {book.title}
           </h3>
           <select
             value={book.status}
-            onChange={(e) => onStatusChange(book._id, e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+            onChange={(e) => {
+              e.stopPropagation();
+              onStatusChange(book._id, e.target.value);
+            }}
             className={`text-[11px] font-bold px-2.5 py-1 rounded-lg border focus:outline-none cursor-pointer ${getStatusBadgeStyle(
               book.status
             )}`}
@@ -69,14 +74,20 @@ export default function BookCard({ book, onEdit, onDelete, onStatusChange }) {
         {/* Action icons */}
         <div className="flex items-center justify-end space-x-2">
           <button
-            onClick={() => onEdit(book)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(book);
+            }}
             className="p-2 text-[#062C19]/70 hover:text-[#062C19] hover:bg-[#F7F5EE] rounded-lg transition cursor-pointer"
             title="Edit book"
           >
             <Edit3 className="w-4 h-4" />
           </button>
           <button
-            onClick={() => onDelete(book._id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(book._id);
+            }}
             className="p-2 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition cursor-pointer"
             title="Delete book"
           >
