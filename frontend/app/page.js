@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
@@ -114,7 +115,7 @@ function WorkspacePreview() {
                 <div className="border border-white/80 bg-white/55 p-4 backdrop-blur-md sm:p-5">
                   <div className="mb-4 flex items-end justify-between"><div><p className="text-[10px] font-black uppercase tracking-[0.12em] text-zinc-950/45">Your active shelf</p><p className="mt-1 text-sm font-black text-zinc-950">Continue reading</p></div><span className="text-[10px] font-bold text-zinc-950/40">3 books visible</span></div>
                   <div className="space-y-2.5">{books.map((book) => <motion.button key={book.title} whileHover={{ x: 3 }} whileTap={{ scale: 0.99 }} onClick={() => handleBookClick(book.title)} className={`flex w-full items-center gap-3 border p-3 text-left transition ${selectedBook === book.title ? "border-zinc-950 bg-neutral-100/95 shadow-sm" : "border-white/80 bg-white/65 hover:border-zinc-950/35"}`}><div className="flex h-11 w-9 shrink-0 items-end justify-center bg-zinc-950 pb-1.5 text-[8px] font-black text-white">BM</div><div className="min-w-0 flex-1"><p className="truncate text-xs font-black text-zinc-950">{book.title}</p><p className="mt-0.5 truncate text-[10px] font-medium text-zinc-950/50">{book.author}</p><span className="mt-2 inline-flex items-center gap-1 text-[9px] font-bold text-zinc-950/45"><Tag className="h-2.5 w-2.5" /> {book.tag}</span></div><div className="hidden text-right sm:block"><StatusPill tone={book.tone}>{book.status}</StatusPill><p className="mt-1 text-[9px] font-bold text-zinc-950/45">{book.progress} tracked</p></div></motion.button>)}</div>
-                  <AnimatePresence initial={false} mode="wait">{quickAddOpen && <motion.div initial={{ opacity: 0, height: 0, y: -8 }} animate={{ opacity: 1, height: "auto", y: 0 }} exit={{ opacity: 0, height: 0, y: -8 }} transition={{ type: "spring", stiffness: 320, damping: 28 }} className="mt-3 flex items-center gap-3 border border-dashed border-zinc-950/25 bg-neutral-100/80 p-3"><span className="flex h-8 w-8 items-center justify-center bg-white text-zinc-950"><BookOpen className="h-4 w-4" /></span><div className="flex-1"><p className="text-[10px] font-black uppercase tracking-[0.1em] text-zinc-950/55">New book draft</p><p className="mt-0.5 text-xs font-bold text-zinc-950">Start with a title and make it yours.</p></div><ArrowRight className="h-3.5 w-3.5 text-zinc-950/45" /></motion.div>}{selectedBook && <motion.div key={selectedBook} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ type: "spring", stiffness: 300, damping: 26 }} className="mt-3 flex items-center justify-between border border-zinc-950/15 bg-white/75 p-3 backdrop-blur"><div><p className="text-[10px] font-black uppercase tracking-[0.1em] text-zinc-950/55">Selected title</p><p className="mt-0.5 text-xs font-black text-zinc-950">{selectedBook}</p></div><span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-950 text-white"><Check className="h-3.5 w-3.5" /></span></motion.div>}</AnimatePresence>
+                  <AnimatePresence initial={false} mode="wait">{quickAddOpen && <motion.div initial={{ opacity: 0, height: 0, y: -8 }} animate={{ opacity: 1, height: "auto", y: 0 }} exit={{ opacity: 0, height: 0, y: -8 }} transition={{ type: "spring", stiffness: 320, damping: 28 }} className="mt-3 flex items-center gap-3 border border-dashed border-zinc-950/25 bg-neutral-100/80 p-3"><span className="flex h-8 w-8 items-center justify-center bg-white text-zinc-950"><BookOpen className="h-4 w-4" /></span><div className="flex-1"><p className="text-[10px] font-black uppercase tracking-[0.1em] text-zinc-950/55">New book draft</p><p className="mt-0.5 text-xs font-bold text-zinc-950">Start with a title and make it yours.</p></div><ArrowRight className="h-3.5 w-3.5 text-zinc-950/45" /></motion.div>}{selectedBook && <motion.div key={selectedBook} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ type: "spring", stiffness: 300, damping: 26 }} className="mt-3 flex items-center justify-between border border-zinc-950/15 bg-white/75 p-3 backdrop-blur"><div><p className="text-[10px] font-black uppercase tracking-[0.1em] text-zinc-950/55">Selected title</p><p className="mt-0.5 text-xs font-black text-[#062C19]">{selectedBook}</p></div><span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-950 text-white"><Check className="h-3.5 w-3.5" /></span></motion.div>}</AnimatePresence>
                 </div>
               </div>
 
@@ -131,6 +132,7 @@ function WorkspacePreview() {
     </motion.div>
   );
 }
+
 function FeaturePreview({ index }) {
   const [selectedTitle, setSelectedTitle] = useState("The Psychology of Money");
   const [period, setPeriod] = useState("Week");
@@ -166,6 +168,7 @@ function FeaturePreview({ index }) {
     </div>
   );
 }
+
 export default function HeroLandingPage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -189,8 +192,16 @@ export default function HeroLandingPage() {
       <main>
         <section className="bg-white px-5 pb-12 pt-28 sm:px-8 sm:pt-32 lg:px-10 lg:pb-16 lg:pt-36">
           <div className="mx-auto max-w-7xl">
-            <div className="relative min-h-[560px] overflow-visible rounded-[26px] border border-white/80 bg-cover bg-center sm:min-h-[660px]" style={{ backgroundImage: "url('/bookshelf-hero.jpg')" }}>
-              <div className="absolute inset-0 rounded-[26px] bg-[linear-gradient(180deg,rgba(0,0,0,0.12),rgba(0,0,0,0.28))]" />
+            <div className="relative min-h-[560px] overflow-hidden rounded-[26px] border border-white/80 sm:min-h-[660px]">
+              <Image
+                src="/bookshelf-hero.jpg"
+                alt="Personal Book Manager Workspace"
+                fill
+                priority
+                quality={70}
+                className="object-cover object-center"
+              />
+              <div className="absolute inset-0 rounded-[26px] bg-[linear-gradient(180deg,rgba(0,0,0,0.22),rgba(0,0,0,0.55))]" />
               <div className="relative z-10 flex min-h-[560px] items-center justify-center px-5 py-16 text-center sm:min-h-[660px] sm:px-10">
                 <motion.div initial="hidden" animate="visible" variants={reveal} transition={{ duration: 0.65 }} className="max-w-2xl text-center">
                   <div className="inline-flex items-center gap-2 border border-white/45 bg-white/10 px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-white backdrop-blur-sm"><Sparkles className="h-3.5 w-3.5" /> Your reading workspace, refined</div>
