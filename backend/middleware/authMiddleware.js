@@ -5,27 +5,28 @@ const userMiddleware = async (req, res, next) => {
   try {
     let token = req.cookies?.token;
 
-    // Fallback for header if cookies are restricted cross-domain
-    if (!token && req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-      token = req.headers.authorization.split(" ")[1];
+    // Check Bearer header fallback for cross-domain requests
+    if (!token || token === "null" || token === "undefined") {
+      if (req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
+        token = req.headers.authorization.split(" ")[1];
+      }
     }
 
-    if (!token) {
-      throw new Error("Token is not present");
+    if (!token || token === "null" || token === "undefined") {
+      return res.status(401).send("Error: Token is not present");
     }
 
-    const payload = jwt.verify(token, process.env.JWT_SECRET || process.env.JWT_KEY || "secretkey");
+    const jwtSecret = process.env.JWT_KEY || process.env.JWT_SECRET || 'secretkey';
+    const payload = jwt.verify(token, jwtSecret);
 
     const { _id } = payload;
-
     if (!_id) {
-      throw new Error("Invalid token");
+      return res.status(401).send("Error: Invalid token");
     }
 
     const result = await User.findById(_id).select("-password");
-
     if (!result) {
-      throw new Error("User Doesn't Exist");
+      return res.status(401).send("Error: User Doesn't Exist");
     }
 
     req.result = result;

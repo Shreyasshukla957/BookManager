@@ -5,17 +5,36 @@ const API = axios.create({
   withCredentials: true,
 });
 
+API.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
+
 export const loginUser = async (email, password) => {
   const { data } = await API.post("/auth/login", { email, password });
+  if (data.token && typeof window !== "undefined") {
+    localStorage.setItem("token", data.token);
+  }
   return data;
 };
 
 export const registerUser = async (name, email, password) => {
   const { data } = await API.post("/auth/register", { name, email, password });
+  if (data.token && typeof window !== "undefined") {
+    localStorage.setItem("token", data.token);
+  }
   return data;
 };
 
 export const logoutUser = async () => {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("token");
+  }
   const { data } = await API.post("/auth/logout");
   return data;
 };
