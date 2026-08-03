@@ -1,123 +1,144 @@
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// function to generate JWT Token
-const generateToken = (id) => {
-  return jwt.sign(
-    { _id: id, id },
-    process.env.JWT_SECRET,
-    { expiresIn: '3d' }
-  );
-};
-
-const registerUser = async (req, res) => {
+const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-      return res.status(400).json({ message: 'Please add all required fields' });
+      throw new Error("Please add all required fields");
     }
 
-    // Check if user exists
-    const userExists = await User.findOne({ email: email.toLowerCase() });
+    const emailId = email.toLowerCase();
+    const userExists = await User.findOne({ email: emailId });
     if (userExists) {
-      return res.status(400).json({ message: 'User already exists with this email' });
+      throw new Error("User already exists with this email");
     }
 
-    // Create user
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
       name,
-      email: email.toLowerCase(),
-      password,
+      email: emailId,
+      password: hashedPassword,
     });
 
-    if (user) {
-      const token = generateToken(user._id);
-      res.cookie('token', token, {
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        secure: process.env.NODE_ENV === 'production',
-      });
+    const token = jwt.sign(
+      { _id: user._id, emailId: user.email },
+      process.env.JWT_SECRET || process.env.JWT_KEY || 'secretkey',
+      { expiresIn: 60 * 60 }
+    );
 
-      res.status(201).json({
-        user: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-        },
-        message: 'User registered successfully',
-      });
-    } else {
-      res.status(400).json({ message: 'Invalid user data' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message || 'Server Error' });
-  }
-};
+    const reply = {
+      name: user.name,
+      email: user.email,
+      _id: user._id,
+    };
 
-const loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Please provide email and password' });
-    }
-
-    // Check for user email
-    const user = await User.findOne({ email: email.toLowerCase() });
-
-    if (user && (await user.matchPassword(password))) {
-      const token = generateToken(user._id);
-      res.cookie('token', token, {
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        secure: process.env.NODE_ENV === 'production',
-      });
-
-      res.status(200).json({
-        user: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-        },
-        message: 'Logged in successfully',
-      });
-    } else {
-      res.status(401).json({ message: 'Invalid credentials (email or password incorrect)' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message || 'Server Error' });
-  }
-};
-
-const logoutUser = async (req, res) => {
-  try {
-    res.cookie('token', '', {
-      expires: new Date(0),
+    res.cookie('token', token, {
+      maxAge: 60 * 60 * 1000,
       httpOnly: true,
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       secure: process.env.NODE_ENV === 'production',
     });
-    res.status(200).send('Logged out successfully');
-  } catch (error) {
-    res.status(500).send('Error: ' + error.message);
+
+    res.status(201).json({
+      user: reply,
+      token,
+      message: "Loggin Successfully"
+    });
+  } catch (err) {
+    res.status(400).send("Error: " + err.message);
+  }
+};
+
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      throw new Error("Invalid Credentials");
+    }
+
+    const emailId = email.toLowerCase();
+    const user = await User.findOne({ email: emailId });
+
+    if (!user) {
+      throw new Error("Invalid Credentials");
+    }
+
+    const match = await bcrypt.compare(password, user.password);
+
+    if (!match) {
+      throw new Error("Invalid Credentials");
+    }
+
+    const reply = {
+      name: user.name,
+      email: user.email,
+      _id: user._id,
+    };
+
+    const token = jwt.sign(
+      { _id: user._id, emailId: user.email },
+      process.env.JWT_SECRET || process.env.JWT_KEY || 'secretkey',
+      { expiresIn: 60 * 60 }
+    );
+
+    res.cookie('token', token, {
+      maxAge: 60 * 60 * 1000,
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    });
+
+    res.status(200).json({
+      user: reply,
+      token,
+      message: "Loggin Successfully"
+    });
+  } catch (err) {
+    res.status(401).send("Error: " + err.message);
+  }
+};
+
+const logout = async (req, res) => {
+  try {
+    res.cookie("token", null, {
+      expires: new Date(Date.now()),
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    });
+    res.send("Logged Out Succesfully");
+  } catch (err) {
+    res.status(503).send("Error: " + err.message);
   }
 };
 
 const getMe = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id || req.user.id).select('-password');
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json({ message: error.message || 'Server Error' });
+    const user = req.result;
+    const reply = {
+      name: user.name,
+      email: user.email,
+      _id: user._id,
+    };
+    res.status(200).json({
+      user: reply,
+      message: "Valid User"
+    });
+  } catch (err) {
+    res.status(500).send("Error: " + err.message);
   }
 };
 
 module.exports = {
-  registerUser,
-  loginUser,
-  logoutUser,
+  register,
+  login,
+  logout,
   getMe,
+  registerUser: register,
+  loginUser: login,
+  logoutUser: logout,
 };

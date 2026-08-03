@@ -1,27 +1,28 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
 const userMiddleware = async (req, res, next) => {
   try {
-    const { token } = req.cookies;
+    let token = req.cookies?.token;
+
+    // Fallback for header if cookies are restricted cross-domain
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+      token = req.headers.authorization.split(" ")[1];
+    }
 
     if (!token) {
-      throw new Error('Token is not present');
+      throw new Error("Token is not present");
     }
 
-    const payload = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
+    const payload = jwt.verify(token, process.env.JWT_SECRET || process.env.JWT_KEY || "secretkey");
 
-    const { _id, id } = payload;
-    const userId = _id || id;
+    const { _id } = payload;
 
-    if (!userId) {
-      throw new Error('Invalid token');
+    if (!_id) {
+      throw new Error("Invalid token");
     }
 
-    const result = await User.findById(userId).select('-password');
+    const result = await User.findById(_id).select("-password");
 
     if (!result) {
       throw new Error("User Doesn't Exist");
@@ -32,8 +33,11 @@ const userMiddleware = async (req, res, next) => {
 
     next();
   } catch (err) {
-    res.status(401).send('Error: ' + err.message);
+    res.status(401).send("Error: " + err.message);
   }
 };
 
-module.exports = { protect: userMiddleware, userMiddleware };
+module.exports = {
+  userMiddleware,
+  protect: userMiddleware,
+};
