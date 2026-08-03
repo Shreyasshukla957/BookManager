@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Edit3, Trash2, Tag, BookOpen } from "lucide-react";
+import { Edit3, Trash2, Tag } from "lucide-react";
 
 export default function BookCard({ book, onEdit, onDelete, onStatusChange }) {
   const getStatusBadgeStyle = (status) => {
@@ -17,11 +17,10 @@ export default function BookCard({ book, onEdit, onDelete, onStatusChange }) {
 
   return (
     <motion.div
-      whileHover={{ y: -5, rotate: -0.25 }}
+      whileHover={{ y: -5, scale: 1.01 }}
       transition={{ duration: 0.2 }}
-      className="group relative overflow-hidden border border-[#E2DDD0] bg-white p-5 shadow-sm transition hover:border-[#062C19]/30 hover:shadow-lg flex flex-col justify-between space-y-4"
+      className="group relative overflow-hidden border border-[#E2DDD0] bg-white p-5 rounded-2xl shadow-sm transition hover:border-[#062C19]/30 hover:shadow-md flex flex-col justify-between space-y-4"
     >
-      <div className="absolute right-0 top-0 h-14 w-14 border-b border-l border-[#E2DDD0] bg-[#F7F5EE] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       <div className="relative space-y-3">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-extrabold text-lg text-[#062C19] leading-snug line-clamp-2">
