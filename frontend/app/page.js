@@ -2,11 +2,68 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { motion } from "motion/react";
-import { Check, ArrowRight, BookOpen, Tag, ShieldCheck, Search, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  BookOpen,
+  Check,
+  Clock3,
+  Library,
+  LockKeyhole,
+  Search,
+  Sparkles,
+  Tag,
+  TrendingUp,
+} from "lucide-react";
 import { getMe } from "@/utils/api";
 
+const reveal = {
+  hidden: { opacity: 0, y: 22 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const featureRows = [
+  {
+    number: "01",
+    eyebrow: "One clear home",
+    title: "Turn your scattered reading list into a useful library.",
+    copy: "Capture titles, authors, tags, and notes in a workspace that is easy to scan whenever you return.",
+    icon: Library,
+    items: ["Keep every title in one place", "Search by author or title", "Add notes while the idea is fresh"],
+  },
+  {
+    number: "02",
+    eyebrow: "A simple rhythm",
+    title: "Know what you are reading now and what comes next.",
+    copy: "Clear reading statuses make your collection feel active without adding another complicated system to maintain.",
+    icon: TrendingUp,
+    items: ["Move books through four statuses", "See your collection at a glance", "Keep your next read visible"],
+  },
+];
+
+function StatusPill({ children, tone = "blue" }) {
+  const tones = {
+    blue: "bg-[#D8EBFF] text-[#0A2540] border-[#BCD8F2]",
+    green: "bg-[#DDF1D9] text-[#22552C] border-[#BFDDBB]",
+    neutral: "bg-[#EEEBE1] text-[#062C19] border-[#E2DDD0]",
+  };
+
+  return <span className={`rounded-md border px-2 py-1 text-[10px] font-black uppercase tracking-[0.08em] ${tones[tone]}`}>{children}</span>;
+}
+
+function WorkspacePreview() {
+  const metrics = [{ label: "Total books", value: "48", icon: Library }, { label: "Want to read", value: "15", icon: Clock3 }, { label: "Reading now", value: "06", icon: BookOpen }, { label: "Completed", value: "27", icon: TrendingUp }];
+  const books = [{ title: "Atomic Habits", author: "James Clear", status: "Reading", tone: "blue", tag: "Productivity" }, { title: "The Creative Act", author: "Rick Rubin", status: "Want to read", tone: "neutral", tag: "Ideas" }, { title: "The Pragmatic Programmer", author: "Andrew Hunt", status: "Completed", tone: "green", tag: "Technology" }];
+
+  return <div className="relative mx-auto w-[calc(100%-16px)] max-w-[1136px]"><div className="min-h-[650px] border border-white/70 bg-white/30 p-2 shadow-[0_28px_70px_rgba(6,44,25,0.18)] backdrop-blur-2xl sm:p-4"><div className="min-h-[630px] overflow-hidden border border-white/70 bg-white/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl"><div className="flex items-center justify-between border-b border-[#E2DDD0]/80 bg-white/45 px-4 py-3 backdrop-blur-md sm:px-6"><div className="flex items-center gap-2"><div className="flex gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-rose-400" /><span className="h-2.5 w-2.5 rounded-full bg-amber-400" /><span className="h-2.5 w-2.5 rounded-full bg-emerald-400" /></div><span className="ml-2 text-[10px] font-black uppercase tracking-[0.12em] text-[#062C19]/45">Book Manager / Overview</span></div><span className="hidden items-center gap-2 text-[10px] font-bold text-[#062C19]/45 sm:flex"><span className="h-1.5 w-1.5 rounded-full bg-[#22552C]" /> Live workspace</span></div><div className="bg-[linear-gradient(135deg,rgba(247,245,238,0.82),rgba(216,235,255,0.28))] p-4 sm:p-6 lg:p-7"><div className="mb-6 flex flex-col justify-between gap-4 border-b border-[#E2DDD0]/80 pb-5 sm:flex-row sm:items-end"><div><p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#062C19]/45">Good afternoon, reader</p><h2 className="mt-1 text-2xl font-black tracking-tight text-[#062C19]">Your reading room</h2></div><div className="flex gap-2"><span className="inline-flex items-center gap-2 border border-white/80 bg-white/55 px-3 py-2 text-[10px] font-bold text-[#062C19]/55"><Search className="h-3 w-3" /> Search</span><span className="inline-flex items-center gap-2 border border-[#062C19] bg-[#062C19] px-3 py-2 text-[10px] font-bold text-white"><BookOpen className="h-3.5 w-3.5" /> Add a book</span></div></div><div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_250px]"><div className="space-y-5"><div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{metrics.map(({ label, value, icon: Icon }, index) => <div key={label} className={`border p-3 backdrop-blur sm:p-4 ${index === 0 ? "border-[#062C19] bg-[#062C19] text-white" : "border-white/75 bg-white/60 text-[#062C19]"}`}><Icon className={`mb-4 h-3.5 w-3.5 ${index === 0 ? "text-[#D2F254]" : "text-[#062C19]/45"}`} /><p className="text-2xl font-black">{value}</p><p className={`mt-1 text-[9px] font-black uppercase tracking-[0.08em] ${index === 0 ? "text-white/60" : "text-[#062C19]/45"}`}>{label}</p></div>)}</div><div className="border border-white/80 bg-white/55 p-4 backdrop-blur-md sm:p-5"><div className="mb-4 flex items-end justify-between"><div><p className="text-[10px] font-black uppercase tracking-[0.12em] text-[#062C19]/45">Your active shelf</p><p className="mt-1 text-sm font-black text-[#062C19]">Continue reading</p></div><span className="text-[10px] font-bold text-[#062C19]/40">3 books visible</span></div><div className="space-y-2.5">{books.map((book) => <div key={book.title} className="flex items-center gap-3 border border-white/80 bg-[#FBFAF7]/65 p-3"><div className="flex h-11 w-9 shrink-0 items-end justify-center bg-[#062C19] pb-1.5 text-[8px] font-black text-[#D2F254]">BM</div><div className="min-w-0 flex-1"><p className="truncate text-xs font-black text-[#062C19]">{book.title}</p><p className="mt-0.5 truncate text-[10px] font-medium text-[#062C19]/50">{book.author}</p><span className="mt-2 inline-flex items-center gap-1 text-[9px] font-bold text-[#062C19]/45"><Tag className="h-2.5 w-2.5" /> {book.tag}</span></div><StatusPill tone={book.tone}>{book.status}</StatusPill></div>)}</div></div></div><aside className="space-y-4 border border-white/80 bg-white/45 p-4 backdrop-blur-md"><div><p className="text-[10px] font-black uppercase tracking-[0.13em] text-[#062C19]/45">Today&apos;s goal</p><p className="mt-1 text-lg font-black text-[#062C19]">Read with intention</p></div><div className="border border-[#E2DDD0] bg-[#EEEBE1]/70 p-4"><div className="flex items-center justify-between"><span className="text-xs font-black text-[#062C19]">65% complete</span><span className="text-[10px] font-bold text-[#22552C]">+10 min</span></div><div className="mt-4 h-2 bg-white/80"><div className="h-full w-[65%] bg-[#062C19]" /></div><p className="mt-3 text-[10px] font-bold text-[#062C19]/45">Reading session in progress</p></div><div className="border-t border-[#E2DDD0] pt-4"><p className="text-[10px] font-black uppercase tracking-[0.13em] text-[#062C19]/45">Recent activity</p><div className="mt-3 space-y-3">{["Finished a note on Atomic Habits", "Added The Creative Act", "Moved Deep Work to completed"].map((activity, index) => <div key={activity} className="flex gap-2.5"><span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${index === 0 ? "bg-[#D2F254] ring-2 ring-[#062C19]" : "bg-[#C2CBBA]"}`} /><p className="text-[10px] font-bold leading-4 text-[#062C19]/60">{activity}</p></div>)}</div></div></aside></div></div></div></div></div>;
+}
+
+function FeaturePreview({ index }) {
+  if (index === 0) return <div className="border border-[#E2DDD0] bg-white p-4 shadow-sm sm:p-5"><div className="flex items-center justify-between border-b border-[#E2DDD0] pb-4"><div><p className="text-[10px] font-black uppercase tracking-[0.14em] text-[#062C19]/45">Library view</p><p className="mt-1 text-sm font-black text-[#062C19]">Keep every title reachable</p></div><Search className="h-3.5 w-3.5 text-[#062C19]/45" /></div><div className="mt-4 space-y-2">{["The Psychology of Money", "The Design of Everyday Things", "Tomorrow, and Tomorrow, and Tomorrow"].map((title, itemIndex) => <div key={title} className="flex items-center gap-3 border border-[#E2DDD0]/70 bg-[#FBFAF7] p-2.5"><span className="text-[10px] font-black text-[#062C19]/35">0{itemIndex + 1}</span><div className="min-w-0 flex-1"><p className="truncate text-xs font-black text-[#062C19]">{title}</p><p className="mt-0.5 text-[10px] font-medium text-[#062C19]/50">Personal collection</p></div></div>)}</div></div>;
+  return <div className="border border-[#E2DDD0] bg-white p-4 shadow-sm sm:p-5"><div className="flex items-center justify-between border-b border-[#E2DDD0] pb-4"><div><p className="text-[10px] font-black uppercase tracking-[0.14em] text-[#062C19]/45">Reading momentum</p><p className="mt-1 text-sm font-black text-[#062C19]">Your reading rhythm</p></div><TrendingUp className="h-4 w-4 text-[#062C19]/40" /></div><div className="mt-4 grid grid-cols-[1fr_auto] gap-4"><div><p className="text-3xl font-black text-[#062C19]">12.4h</p><p className="mt-1 text-[10px] font-bold uppercase tracking-[0.1em] text-[#062C19]/45">tracked this week</p></div><span className="border border-[#C2CBBA] bg-[#C2CBBA]/55 px-3 py-2 text-xs font-black text-[#22552C]">+18.6%</span></div><div className="mt-5 flex h-28 items-end gap-1.5 border-b border-[#E2DDD0] pb-2">{[42, 64, 50, 78, 58, 94, 72].map((height, barIndex) => <span key={barIndex} style={{ height: `${height}%` }} className={`flex-1 ${barIndex === 5 ? "bg-[#062C19]" : "bg-[#C2CBBA]"}`} />)}</div><div className="mt-4 border border-[#EEEBE1] bg-[#EEEBE1]/80 p-3"><p className="text-[10px] font-black uppercase tracking-[0.1em] text-[#062C19]/45">Selected session</p><p className="mt-1 text-xs font-black text-[#062C19]">68 focused minutes</p></div></div>;
+}
 export default function HeroLandingPage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -14,302 +71,39 @@ export default function HeroLandingPage() {
 
   useEffect(() => {
     async function checkAuth() {
-      try {
-        await getMe();
-        setIsAuthenticated(true);
-      } catch (err) {
-        setIsAuthenticated(false);
-      } finally {
-        setLoading(false);
-      }
+      try { await getMe(); setIsAuthenticated(true); } catch (err) { setIsAuthenticated(false); } finally { setLoading(false); }
     }
     checkAuth();
   }, []);
 
-  const handleEnterDashboard = () => {
-    if (isAuthenticated) {
-      router.push("/dashboard");
-    } else {
-      router.push("/login");
-    }
-  };
+  const handleEnterDashboard = () => router.push(isAuthenticated ? "/dashboard" : "/login");
 
   return (
-    <div className="min-h-screen bg-[#F7F5EE] text-[#062C19] font-sans selection:bg-[#062C19] selection:text-white">
-      {/* Editorial Header */}
-      <header className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          className="flex items-center space-x-2 cursor-pointer"
-          onClick={() => router.push("/")}
-        >
-          <span className="text-2xl font-black tracking-tighter uppercase text-[#062C19]">
-            BOOK MANAGER
-          </span>
-        </motion.div>
-
-        <nav className="hidden md:flex items-center space-x-8 text-sm font-bold text-[#062C19]/80">
-          <a href="#features" className="hover:text-[#062C19] transition">Features</a>
-          <a href="#philosophy" className="hover:text-[#062C19] transition">Philosophy</a>
-          <a href="#stats" className="hover:text-[#062C19] transition">Analytics</a>
-        </nav>
-
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          className="flex items-center space-x-4"
-        >
-          {!loading && isAuthenticated ? (
-            <motion.button
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              onClick={() => router.push("/dashboard")}
-              className="px-5 py-2.5 text-sm font-bold text-white bg-[#062C19] hover:bg-[#0a4227] rounded-xl transition flex items-center space-x-2 cursor-pointer shadow-md shadow-[#062C19]/20"
-            >
-              <span>Dashboard</span>
-              <ArrowRight className="w-4 h-4" />
-            </motion.button>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="text-sm font-bold text-[#062C19] hover:opacity-80 transition px-3 py-2"
-              >
-                Login
-              </Link>
-              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
-                <Link
-                  href="/register"
-                  className="px-5 py-2.5 text-sm font-bold text-white bg-[#062C19] hover:bg-[#0a4227] rounded-xl transition flex items-center space-x-2 cursor-pointer shadow-md shadow-[#062C19]/20"
-                >
-                  <span>Try for free</span>
-                </Link>
-              </motion.div>
-            </>
-          )}
-        </motion.div>
+    <div className="min-h-screen overflow-hidden bg-[#F7F5EE] font-sans text-[#062C19] selection:bg-[#062C19] selection:text-white">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-[#E2DDD0]/80 bg-[#F7F5EE]/95 backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8 lg:px-10"><Link href="/" className="flex items-center gap-2.5"><span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#062C19] text-[#D2F254]"><BookOpen className="h-4 w-4" /></span><span className="text-base font-black uppercase tracking-[-0.06em] sm:text-lg">Book Manager</span></Link><nav className="hidden items-center gap-8 text-xs font-black uppercase tracking-[0.12em] text-[#062C19]/60 md:flex"><a href="#features" className="transition hover:text-[#062C19]">Features</a><a href="#workflow" className="transition hover:text-[#062C19]">Workflow</a><a href="#security" className="transition hover:text-[#062C19]">Security</a></nav><div className="flex items-center gap-2 sm:gap-4">{!loading && isAuthenticated ? <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }} onClick={() => router.push("/dashboard")} className="inline-flex items-center gap-2 rounded-lg bg-[#062C19] px-4 py-2.5 text-xs font-black text-white transition hover:bg-[#0a4227] sm:px-5">Workspace <ArrowUpRight className="h-3.5 w-3.5" /></motion.button> : <><Link href="/login" className="hidden px-2 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#062C19]/70 transition hover:text-[#062C19] sm:block">Log in</Link><Link href="/register" className="inline-flex items-center gap-2 rounded-lg bg-[#062C19] px-4 py-2.5 text-xs font-black text-white transition hover:bg-[#0a4227] sm:px-5">Start reading <ArrowRight className="h-3.5 w-3.5" /></Link></>}</div></div>
       </header>
 
-      {/* Main Hero Banner */}
-      <main className="max-w-7xl mx-auto px-6 pt-10 pb-20 space-y-16">
-        {/* Top Floating Tag Pill */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="inline-block"
-        >
-          <motion.span
-            animate={{ y: [0, -3, 0] }}
-            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-            className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-[#EEEBE1] text-xs font-bold text-[#062C19]/90 border border-[#E2DDD0] shadow-sm"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-[#062C19]" />
-            <span>Personal reading space for book lovers</span>
-          </motion.span>
-        </motion.div>
-
-        {/* Hero Title & Checklist Split */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          {/* Left Large Headline */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="lg:col-span-7 space-y-6"
-          >
-            <h1 className="text-5xl sm:text-7xl font-black text-[#062C19] tracking-tight uppercase leading-[0.95]">
-              LOG BOOKS. <br />
-              TRACK HABITS. <br />
-              KEEP READING.
-            </h1>
-
-            <p id="philosophy" className="text-base sm:text-lg font-medium text-[#062C19]/70 max-w-xl leading-relaxed">
-              "Simple can be harder than complex. But it's worth it because once you get there, you can move mountains."
-            </p>
-          </motion.div>
-
-          {/* Right Checklist & Action CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.15 }}
-            className="lg:col-span-5 space-y-8 pt-2"
-          >
-            <ul className="space-y-3.5 text-sm font-bold text-[#062C19]">
-              <motion.li whileHover={{ x: 3 }} className="flex items-center space-x-3 transition cursor-default">
-                <div className="w-5 h-5 rounded-full bg-[#062C19] text-white flex items-center justify-center shrink-0 shadow-sm">
-                  <Check className="w-3.5 h-3.5" />
-                </div>
-                <span>Track Want to Read, Reading & Completed</span>
-              </motion.li>
-              <motion.li whileHover={{ x: 3 }} className="flex items-center space-x-3 transition cursor-default">
-                <div className="w-5 h-5 rounded-full bg-[#062C19] text-white flex items-center justify-center shrink-0 shadow-sm">
-                  <Check className="w-3.5 h-3.5" />
-                </div>
-                <span>Instant custom tags & author search</span>
-              </motion.li>
-              <motion.li whileHover={{ x: 3 }} className="flex items-center space-x-3 transition cursor-default">
-                <div className="w-5 h-5 rounded-full bg-[#062C19] text-white flex items-center justify-center shrink-0 shadow-sm">
-                  <Check className="w-3.5 h-3.5" />
-                </div>
-                <span>Private HTTP-only JWT reader security</span>
-              </motion.li>
-            </ul>
-
-            <div className="space-y-4 pt-2">
-              <div className="flex flex-wrap items-center gap-4">
-                {/* Main CTA Button with Glow & Arrow Pill */}
-                <motion.button
-                  whileHover={{ scale: 1.04, y: -2 }}
-                  whileTap={{ scale: 0.96 }}
-                  onClick={handleEnterDashboard}
-                  className="px-7 py-4 bg-[#062C19] hover:bg-[#0a4227] text-white font-black text-base rounded-2xl transition flex items-center space-x-3 shadow-xl shadow-[#062C19]/30 hover:shadow-[#062C19]/40 cursor-pointer group"
-                >
-                  <span>Enter Dashboard</span>
-                  <div className="w-7 h-7 rounded-full bg-[#D2F254] text-[#062C19] flex items-center justify-center font-bold text-sm group-hover:translate-x-1 transition-transform">
-                    →
-                  </div>
-                </motion.button>
-
-                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                  <Link
-                    href="/register"
-                    className="px-6 py-4 bg-[#EEEBE1] hover:bg-[#e4dfd2] text-[#062C19] font-bold text-base rounded-2xl border border-[#E2DDD0] transition text-center inline-block shadow-sm"
-                  >
-                    Create Account
-                  </Link>
-                </motion.div>
-              </div>
-
-              <div className="inline-block bg-[#D2F254] text-[#062C19] text-xs font-black px-3.5 py-1.5 rounded-lg tracking-wider shadow-sm">
-                BOOK MANAGER PLATFORM
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Hero App Showcase UI Mockup Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="rounded-3xl bg-gradient-to-tr from-[#D9A18F] via-[#C98B8B] to-[#9C75A1] p-6 sm:p-10 shadow-2xl relative overflow-hidden"
-        >
-          {/* Floating UI Mockup */}
-          <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-2xl border border-black/5 space-y-6 text-[#062C19]">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 rounded-full bg-rose-400" />
-                <div className="w-3 h-3 rounded-full bg-amber-400" />
-                <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                <span className="text-xs font-bold text-slate-400 ml-2">Book Manager Workspace</span>
-              </div>
-              <span className="text-xs font-bold bg-[#EEEBE1] px-3 py-1 rounded-md text-[#062C19]">
-                Live Preview
-              </span>
-            </div>
-
-            {/* Filter Bar Mockup */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#F7F5EE] p-4 rounded-xl border border-[#E2DDD0]">
-              <div className="flex items-center space-x-2 bg-white px-3.5 py-2 rounded-lg border border-slate-200 w-full sm:w-80">
-                <Search className="w-4 h-4 text-slate-400" />
-                <span className="text-xs text-slate-400 font-medium">Search title or author...</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="px-3 py-1.5 bg-[#062C19] text-white text-xs font-bold rounded-lg">All</span>
-                <span className="px-3 py-1.5 bg-white text-slate-600 text-xs font-bold rounded-lg border border-slate-200">Reading</span>
-                <span className="px-3 py-1.5 bg-white text-slate-600 text-xs font-bold rounded-lg border border-slate-200">Completed</span>
-              </div>
-            </div>
-
-            {/* Book Cards Preview Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              <motion.div
-                whileHover={{ y: -3 }}
-                className="bg-[#F7F5EE] p-5 rounded-xl border border-[#E2DDD0] space-y-3 transition"
-              >
-                <div className="flex items-center justify-between">
-                  <h4 className="font-extrabold text-base text-[#062C19]">Atomic Habits</h4>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-sky-100 text-sky-800 border border-sky-200">
-                    Reading
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500 font-medium">by James Clear</p>
-                <div className="flex space-x-1">
-                  <span className="text-[10px] font-bold bg-white text-[#062C19] px-2 py-0.5 rounded border border-slate-200">#Productivity</span>
-                </div>
-              </motion.div>
-
-              <motion.div
-                whileHover={{ y: -3 }}
-                className="bg-[#F7F5EE] p-5 rounded-xl border border-[#E2DDD0] space-y-3 transition"
-              >
-                <div className="flex items-center justify-between">
-                  <h4 className="font-extrabold text-base text-[#062C19]">The Pragmatic Programmer</h4>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
-                    Completed
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500 font-medium">by Andrew Hunt</p>
-                <div className="flex space-x-1">
-                  <span className="text-[10px] font-bold bg-white text-[#062C19] px-2 py-0.5 rounded border border-slate-200">#Tech</span>
-                </div>
-              </motion.div>
-            </div>
+      <main>
+        <section className="px-5 pb-20 pt-32 sm:px-8 sm:pt-40 lg:px-10 lg:pb-28 lg:pt-44">
+          <div className="mx-auto max-w-7xl">
+          <motion.div initial="hidden" animate="visible" variants={reveal} transition={{ duration: 0.6 }} className="mx-auto max-w-4xl text-center"><div className="inline-flex items-center gap-2 border border-[#E2DDD0] bg-[#EEEBE1] px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-[#062C19]/75"><Sparkles className="h-3.5 w-3.5" /> Your reading workspace, refined</div><h1 className="mt-6 text-4xl font-black uppercase leading-[0.98] tracking-[-0.06em] text-[#062C19] sm:text-6xl lg:text-[4.4rem]">Make room for what you want to read.</h1><p className="mx-auto mt-5 max-w-xl text-sm font-medium leading-6 text-[#062C19]/65 sm:text-base">Book Manager gives your personal library a simple operating system: capture the books that matter, track your momentum, and always know what comes next.</p><div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row"><motion.button whileHover={{ y: -3 }} whileTap={{ scale: 0.97 }} onClick={handleEnterDashboard} className="group inline-flex items-center justify-center gap-3 rounded-lg bg-[#062C19] px-5 py-3 text-xs font-black text-white transition hover:bg-[#0a4227]">Enter your workspace <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D2F254] text-[#062C19] transition group-hover:translate-x-1"><ArrowRight className="h-4 w-4" /></span></motion.button><Link href="#features" className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#E2DDD0] bg-white/60 px-5 py-3 text-xs font-black text-[#062C19] transition hover:bg-white">See how it works <ArrowRight className="h-4 w-4" /></Link></div><div className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-3 text-xs font-bold text-[#062C19]/55"><span className="inline-flex items-center gap-2"><Check className="h-4 w-4" /> Free to get started</span><span className="inline-flex items-center gap-2"><LockKeyhole className="h-4 w-4" /> Private by design</span></div></motion.div>
+          <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.75, delay: 0.2 }} className="mt-10"><WorkspacePreview /></motion.div>
           </div>
-        </motion.div>
-
-        {/* Bottom 3 Editorial Metric Blocks */}
-        <section id="stats" className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
-          {/* Card 1: Deep Forest Green */}
-          <motion.div
-            whileHover={{ y: -6, transition: { duration: 0.2 } }}
-            className="bg-[#062C19] text-[#D2F254] rounded-3xl p-8 space-y-6 shadow-xl"
-          >
-            <span className="text-6xl sm:text-7xl font-serif font-bold tracking-tight block">
-              100%
-            </span>
-            <p className="text-sm font-semibold text-white/90 leading-snug">
-              private data isolation and JWT reader protection for your personal collection
-            </p>
-          </motion.div>
-
-          {/* Card 2: Light Sky Blue */}
-          <motion.div
-            whileHover={{ y: -6, transition: { duration: 0.2 } }}
-            className="bg-[#D8EBFF] text-[#0A2540] rounded-3xl p-8 space-y-6 shadow-xl"
-          >
-            <span className="text-6xl sm:text-7xl font-serif font-bold tracking-tight block">
-              63%
-            </span>
-            <p className="text-sm font-semibold text-[#0A2540]/90 leading-snug">
-              more books completed with active status tracking and tags
-            </p>
-          </motion.div>
-
-          {/* Card 3: Sage Olive Green */}
-          <motion.div
-            whileHover={{ y: -6, transition: { duration: 0.2 } }}
-            className="bg-[#C2CBBA] text-[#062C19] rounded-3xl p-8 space-y-6 shadow-xl"
-          >
-            <span className="text-6xl sm:text-7xl font-serif font-bold tracking-tight block">
-              0%
-            </span>
-            <p className="text-sm font-semibold text-[#062C19]/90 leading-snug">
-              clutter — focused purely on logging books, habits, and authors
-            </p>
-          </motion.div>
         </section>
+
+        <section className="border-y border-[#E2DDD0] bg-white/45 px-5 sm:px-8 lg:px-10"><div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-[#E2DDD0] sm:grid-cols-4">{[{ value: "48", label: "books in one view" }, { value: "04", label: "clear statuses" }, { value: "∞", label: "room for notes" }, { value: "100%", label: "your collection" }].map((item) => <div key={item.label} className="px-4 py-6 first:pl-0 sm:px-7 sm:py-7 sm:first:pl-0"><p className="text-2xl font-black tracking-tight text-[#062C19] sm:text-3xl">{item.value}</p><p className="mt-1 text-[9px] font-black uppercase tracking-[0.13em] text-[#062C19]/45 sm:text-[10px]">{item.label}</p></div>)}</div></section>
+
+        <section id="features" className="px-5 py-20 sm:px-8 lg:px-10 lg:py-28"><motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.25 }} variants={reveal} transition={{ duration: 0.6 }} className="mx-auto max-w-2xl text-center"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#062C19]/50">A focused toolkit</p><h2 className="mt-4 text-4xl font-black uppercase leading-[0.98] tracking-[-0.06em] text-[#062C19] sm:text-5xl">Everything you need to keep reading.</h2><p className="mt-5 text-base font-medium leading-7 text-[#062C19]/60">A clear structure for the books you own, the books you are reading, and the ideas you do not want to lose.</p></motion.div><div className="mx-auto mt-16 max-w-7xl divide-y divide-[#E2DDD0] border-y border-[#E2DDD0]">{featureRows.map(({ number, eyebrow, title, copy, icon: Icon, items }, index) => <div key={number} className="grid gap-10 py-12 first:pt-10 last:pb-10 lg:grid-cols-[64px_0.9fr_1.1fr] lg:items-center lg:gap-12"><span className="text-sm font-black text-[#062C19]/35">{number}</span><motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.25 }} variants={reveal} transition={{ duration: 0.5 }}><div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#EEEBE1] text-[#062C19]"><Icon className="h-5 w-5" /></div><p className="mt-6 text-[10px] font-black uppercase tracking-[0.16em] text-[#062C19]/50">{eyebrow}</p><h3 className="mt-3 max-w-lg text-3xl font-black leading-tight tracking-[-0.04em] text-[#062C19]">{title}</h3><p className="mt-5 max-w-lg text-sm font-medium leading-6 text-[#062C19]/60">{copy}</p></motion.div><motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.25 }} variants={reveal} transition={{ duration: 0.5, delay: 0.1 }}><FeaturePreview index={index} /><div className="mt-5 grid gap-2 sm:grid-cols-3 lg:grid-cols-1">{items.map((item) => <div key={item} className="flex items-center gap-2 text-xs font-bold text-[#062C19]/60"><Check className="h-3.5 w-3.5 text-[#062C19]" /> {item}</div>)}</div></motion.div></div>)}</div></section>
+
+        <section id="workflow" className="mx-5 bg-[#062C19] text-white sm:mx-8 lg:mx-10"><div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:px-10 lg:py-24"><div className="grid gap-12 lg:grid-cols-[0.7fr_1.3fr] lg:gap-24"><div><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#D2F254]/75">A simple rhythm</p><h2 className="mt-4 text-4xl font-black uppercase leading-[0.98] tracking-[-0.06em] sm:text-5xl">Capture, sort, return.</h2><p className="mt-6 max-w-md text-base font-medium leading-7 text-white/65">Book Manager is designed to make the next reading session easier to begin.</p><Link href="/register" className="mt-8 inline-flex items-center gap-2 rounded-lg bg-[#D2F254] px-5 py-3 text-xs font-black text-[#062C19] transition hover:bg-[#e0ff79]">Build your shelf <ArrowRight className="h-4 w-4" /></Link></div><div className="grid divide-y divide-white/15 border-y border-white/15 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:border-y-0">{[{ number: "01", title: "Capture", copy: "Add a title, author, tag, or note." }, { number: "02", title: "Sort", copy: "Keep the next step visible." }, { number: "03", title: "Return", copy: "Pick up exactly where you left off." }].map((step) => <div key={step.number} className="py-7 first:pt-7 sm:px-6 sm:py-0 sm:first:pl-0"><span className="text-sm font-black text-[#D2F254]">{step.number}</span><h3 className="mt-8 text-xl font-black text-white">{step.title}</h3><p className="mt-3 text-sm font-medium leading-6 text-white/55">{step.copy}</p></div>)}</div></div></div></section>
+
+        <section id="security" className="px-5 py-20 sm:px-8 lg:px-10 lg:py-28"><div className="mx-auto grid max-w-7xl gap-10 border-y border-[#E2DDD0] py-12 lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-20"><div><div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#062C19] text-[#D2F254]"><LockKeyhole className="h-5 w-5" /></div><p className="mt-7 text-[10px] font-black uppercase tracking-[0.18em] text-[#062C19]/55">Private by design</p><h2 className="mt-3 max-w-xl text-3xl font-black leading-tight tracking-[-0.04em] text-[#062C19] sm:text-4xl">A personal library should feel personal.</h2><p className="mt-5 max-w-xl text-sm font-medium leading-6 text-[#062C19]/60">Your account, notes, and collection stay behind a secure session. The interface stays quiet so the product never gets in the way of the habit.</p></div><div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1"><div className="flex items-center gap-3 border border-[#E2DDD0] bg-[#EEEBE1] p-4"><Check className="h-4 w-4 text-[#062C19]" /><span className="text-sm font-black">Private collections</span></div><div className="flex items-center gap-3 border border-[#E2DDD0] bg-[#D8EBFF] p-4"><Search className="h-4 w-4 text-[#0A2540]" /><span className="text-sm font-black text-[#0A2540]">Fast, focused search</span></div><div className="flex items-center gap-3 border border-[#E2DDD0] bg-[#C2CBBA] p-4"><Tag className="h-4 w-4 text-[#062C19]" /><span className="text-sm font-black">Flexible tags</span></div></div></div></section>
+
+        <section className="px-5 pb-20 sm:px-8 lg:px-10 lg:pb-28"><div className="mx-auto max-w-7xl border border-[#062C19] bg-[#D2F254] px-6 py-12 text-[#062C19] sm:px-12 sm:py-16 lg:px-16"><div className="mx-auto max-w-2xl text-center"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#062C19]/60">Start with one book</p><h2 className="mt-4 text-4xl font-black uppercase leading-[0.96] tracking-[-0.06em] sm:text-5xl">Make your next reading session easier to begin.</h2><div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row"><Link href="/register" className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#062C19] px-5 py-3.5 text-sm font-black text-white transition hover:bg-[#0a4227]">Create your account <ArrowRight className="h-4 w-4" /></Link><Link href="/login" className="inline-flex items-center justify-center rounded-lg border border-[#062C19]/20 bg-white/30 px-5 py-3.5 text-sm font-black transition hover:bg-white/45">I already have an account</Link></div></div></div></section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-[#E2DDD0] py-8 text-center text-xs font-semibold text-[#062C19]/60">
-        <p>Book Manager • Personal Book Collection Space</p>
-      </footer>
+      <footer className="border-t border-[#E2DDD0] bg-[#F7F5EE]"><div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10"><Link href="/" className="flex items-center gap-2 text-sm font-black uppercase tracking-[-0.04em]"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#062C19] text-[#D2F254]"><BookOpen className="h-3.5 w-3.5" /></span>Book Manager</Link><div className="flex items-center gap-5 text-[10px] font-black uppercase tracking-[0.12em] text-[#062C19]/45"><span>Personal reading, organized</span><span className="hidden sm:block">Built for your shelf</span></div></div></footer>
     </div>
   );
 }
