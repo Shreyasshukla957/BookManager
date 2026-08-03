@@ -5,38 +5,17 @@ const API = axios.create({
   withCredentials: true,
 });
 
-// Interceptor to attach Authorization Bearer token header if present in localStorage
-API.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-  return config;
-});
-
-// Auth API (Codix Style)
 export const loginUser = async (email, password) => {
   const { data } = await API.post("/auth/login", { email, password });
-  if (data.token && typeof window !== "undefined") {
-    localStorage.setItem("token", data.token);
-  }
   return data;
 };
 
 export const registerUser = async (name, email, password) => {
   const { data } = await API.post("/auth/register", { name, email, password });
-  if (data.token && typeof window !== "undefined") {
-    localStorage.setItem("token", data.token);
-  }
   return data;
 };
 
 export const logoutUser = async () => {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("token");
-  }
   const { data } = await API.post("/auth/logout");
   return data;
 };
@@ -46,7 +25,6 @@ export const getMe = async () => {
   return data.user || data;
 };
 
-// Books API
 export const getBooks = async (status = "", search = "") => {
   const params = {};
   if (status) params.status = status;
