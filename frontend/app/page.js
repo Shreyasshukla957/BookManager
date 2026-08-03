@@ -54,15 +54,117 @@ function StatusPill({ children, tone = "blue" }) {
 }
 
 function WorkspacePreview() {
-  const metrics = [{ label: "Total books", value: "48", icon: Library }, { label: "Want to read", value: "15", icon: Clock3 }, { label: "Reading now", value: "06", icon: BookOpen }, { label: "Completed", value: "27", icon: TrendingUp }];
-  const books = [{ title: "Atomic Habits", author: "James Clear", status: "Reading", tone: "blue", tag: "Productivity" }, { title: "The Creative Act", author: "Rick Rubin", status: "Want to read", tone: "neutral", tag: "Ideas" }, { title: "The Pragmatic Programmer", author: "Andrew Hunt", status: "Completed", tone: "green", tag: "Technology" }];
+  const [activeMetric, setActiveMetric] = useState("Total books");
+  const [selectedBook, setSelectedBook] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [goalProgress, setGoalProgress] = useState(65);
+  const [notice, setNotice] = useState("Select a tile or book to preview your workspace.");
 
-  return <div className="relative mx-auto w-[calc(100%-16px)] max-w-[1136px]"><div className="min-h-[650px] border border-white/70 bg-white/30 p-2 shadow-[0_28px_70px_rgba(6,44,25,0.18)] backdrop-blur-2xl sm:p-4"><div className="min-h-[630px] overflow-hidden border border-white/70 bg-white/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl"><div className="flex items-center justify-between border-b border-[#E2DDD0]/80 bg-white/45 px-4 py-3 backdrop-blur-md sm:px-6"><div className="flex items-center gap-2"><div className="flex gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-rose-400" /><span className="h-2.5 w-2.5 rounded-full bg-amber-400" /><span className="h-2.5 w-2.5 rounded-full bg-emerald-400" /></div><span className="ml-2 text-[10px] font-black uppercase tracking-[0.12em] text-[#062C19]/45">Book Manager / Overview</span></div><span className="hidden items-center gap-2 text-[10px] font-bold text-[#062C19]/45 sm:flex"><span className="h-1.5 w-1.5 rounded-full bg-[#22552C]" /> Live workspace</span></div><div className="bg-[linear-gradient(135deg,rgba(247,245,238,0.82),rgba(216,235,255,0.28))] p-4 sm:p-6 lg:p-7"><div className="mb-6 flex flex-col justify-between gap-4 border-b border-[#E2DDD0]/80 pb-5 sm:flex-row sm:items-end"><div><p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#062C19]/45">Good afternoon, reader</p><h2 className="mt-1 text-2xl font-black tracking-tight text-[#062C19]">Your reading room</h2></div><div className="flex gap-2"><span className="inline-flex items-center gap-2 border border-white/80 bg-white/55 px-3 py-2 text-[10px] font-bold text-[#062C19]/55"><Search className="h-3 w-3" /> Search</span><span className="inline-flex items-center gap-2 border border-[#062C19] bg-[#062C19] px-3 py-2 text-[10px] font-bold text-white"><BookOpen className="h-3.5 w-3.5" /> Add a book</span></div></div><div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_250px]"><div className="space-y-5"><div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{metrics.map(({ label, value, icon: Icon }, index) => <div key={label} className={`border p-3 backdrop-blur sm:p-4 ${index === 0 ? "border-[#062C19] bg-[#062C19] text-white" : "border-white/75 bg-white/60 text-[#062C19]"}`}><Icon className={`mb-4 h-3.5 w-3.5 ${index === 0 ? "text-[#D2F254]" : "text-[#062C19]/45"}`} /><p className="text-2xl font-black">{value}</p><p className={`mt-1 text-[9px] font-black uppercase tracking-[0.08em] ${index === 0 ? "text-white/60" : "text-[#062C19]/45"}`}>{label}</p></div>)}</div><div className="border border-white/80 bg-white/55 p-4 backdrop-blur-md sm:p-5"><div className="mb-4 flex items-end justify-between"><div><p className="text-[10px] font-black uppercase tracking-[0.12em] text-[#062C19]/45">Your active shelf</p><p className="mt-1 text-sm font-black text-[#062C19]">Continue reading</p></div><span className="text-[10px] font-bold text-[#062C19]/40">3 books visible</span></div><div className="space-y-2.5">{books.map((book) => <div key={book.title} className="flex items-center gap-3 border border-white/80 bg-[#FBFAF7]/65 p-3"><div className="flex h-11 w-9 shrink-0 items-end justify-center bg-[#062C19] pb-1.5 text-[8px] font-black text-[#D2F254]">BM</div><div className="min-w-0 flex-1"><p className="truncate text-xs font-black text-[#062C19]">{book.title}</p><p className="mt-0.5 truncate text-[10px] font-medium text-[#062C19]/50">{book.author}</p><span className="mt-2 inline-flex items-center gap-1 text-[9px] font-bold text-[#062C19]/45"><Tag className="h-2.5 w-2.5" /> {book.tag}</span></div><StatusPill tone={book.tone}>{book.status}</StatusPill></div>)}</div></div></div><aside className="space-y-4 border border-white/80 bg-white/45 p-4 backdrop-blur-md"><div><p className="text-[10px] font-black uppercase tracking-[0.13em] text-[#062C19]/45">Today&apos;s goal</p><p className="mt-1 text-lg font-black text-[#062C19]">Read with intention</p></div><div className="border border-[#E2DDD0] bg-[#EEEBE1]/70 p-4"><div className="flex items-center justify-between"><span className="text-xs font-black text-[#062C19]">65% complete</span><span className="text-[10px] font-bold text-[#22552C]">+10 min</span></div><div className="mt-4 h-2 bg-white/80"><div className="h-full w-[65%] bg-[#062C19]" /></div><p className="mt-3 text-[10px] font-bold text-[#062C19]/45">Reading session in progress</p></div><div className="border-t border-[#E2DDD0] pt-4"><p className="text-[10px] font-black uppercase tracking-[0.13em] text-[#062C19]/45">Recent activity</p><div className="mt-3 space-y-3">{["Finished a note on Atomic Habits", "Added The Creative Act", "Moved Deep Work to completed"].map((activity, index) => <div key={activity} className="flex gap-2.5"><span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${index === 0 ? "bg-[#D2F254] ring-2 ring-[#062C19]" : "bg-[#C2CBBA]"}`} /><p className="text-[10px] font-bold leading-4 text-[#062C19]/60">{activity}</p></div>)}</div></div></aside></div></div></div></div></div>;
+  const metrics = [
+    { label: "Total books", value: "48", icon: Library },
+    { label: "Want to read", value: "15", icon: Clock3 },
+    { label: "Reading now", value: "06", icon: BookOpen },
+    { label: "Completed", value: "27", icon: TrendingUp },
+  ];
+
+  const books = [
+    { title: "Atomic Habits", author: "James Clear", status: "Reading", tone: "blue", tag: "Productivity", progress: "68%" },
+    { title: "The Creative Act", author: "Rick Rubin", status: "Want to read", tone: "neutral", tag: "Ideas", progress: "12%" },
+    { title: "The Pragmatic Programmer", author: "Andrew Hunt", status: "Completed", tone: "green", tag: "Technology", progress: "100%" },
+  ];
+
+  const handleMetricClick = (label) => {
+    setActiveMetric(label);
+    setNotice(`${label} is ready to explore.`);
+  };
+
+  const handleBookClick = (title) => {
+    setSelectedBook(title);
+    setNotice(`${title} selected from your shelf.`);
+  };
+
+  const advanceGoal = () => {
+    const nextProgress = goalProgress >= 95 ? 20 : goalProgress + 10;
+    setGoalProgress(nextProgress);
+    setNotice(`Reading goal updated to ${nextProgress}%.`);
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 180, damping: 24 }} className="relative mx-auto w-[calc(100%-16px)] max-w-[1136px]">
+      <div className="min-h-[650px] border border-white/70 bg-white/30 p-2 shadow-[0_28px_70px_rgba(6,44,25,0.18)] backdrop-blur-2xl sm:p-4">
+        <div className="min-h-[630px] overflow-hidden border border-white/70 bg-white/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl">
+          <div className="flex items-center justify-between border-b border-[#E2DDD0]/80 bg-white/45 px-4 py-3 backdrop-blur-md sm:px-6">
+            <div className="flex items-center gap-2"><div className="flex gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-rose-400" /><span className="h-2.5 w-2.5 rounded-full bg-amber-400" /><span className="h-2.5 w-2.5 rounded-full bg-emerald-400" /></div><span className="ml-2 text-[10px] font-black uppercase tracking-[0.12em] text-[#062C19]/45">Book Manager / Overview</span></div>
+            <motion.span animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2.5, repeat: Infinity }} className="hidden items-center gap-2 text-[10px] font-bold text-[#062C19]/45 sm:flex"><span className="h-1.5 w-1.5 rounded-full bg-[#22552C]" /> Live workspace</motion.span>
+          </div>
+
+          <div className="bg-[linear-gradient(135deg,rgba(247,245,238,0.82),rgba(216,235,255,0.28))] p-4 sm:p-6 lg:p-7">
+            <div className="mb-6 flex flex-col justify-between gap-4 border-b border-[#E2DDD0]/80 pb-5 sm:flex-row sm:items-end">
+              <div><p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#062C19]/45">Good afternoon, reader</p><h2 className="mt-1 text-2xl font-black tracking-tight text-[#062C19]">Your reading room</h2></div>
+              <div className="flex flex-wrap gap-2"><motion.button whileTap={{ scale: 0.96 }} onClick={() => setSearchFocused(!searchFocused)} className={`inline-flex items-center gap-2 border px-3 py-2 text-[10px] font-bold backdrop-blur transition ${searchFocused ? "border-[#062C19] bg-[#EEEBE1]/85 text-[#062C19]" : "border-white/80 bg-white/55 text-[#062C19]/55 hover:border-[#062C19]/25"}`}><Search className="h-3 w-3" /> {searchFocused ? "Search active" : "Search"}</motion.button><motion.button whileTap={{ scale: 0.96 }} onClick={() => { setQuickAddOpen(!quickAddOpen); setNotice(quickAddOpen ? "Quick add closed." : "Quick add is ready for your next book."); }} className="inline-flex items-center gap-2 border border-[#062C19] bg-[#062C19] px-3 py-2 text-[10px] font-bold text-white transition hover:bg-[#0a4227]"><BookOpen className="h-3.5 w-3.5" /> Add a book</motion.button></div>
+            </div>
+
+            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_250px]">
+              <div className="space-y-5">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {metrics.map(({ label, value, icon: Icon }, index) => <motion.button key={label} whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }} onClick={() => handleMetricClick(label)} layout="position" transition={{ type: "spring", stiffness: 420, damping: 28 }} className={`border p-3 text-left backdrop-blur transition sm:p-4 ${activeMetric === label ? "border-[#062C19] ring-2 ring-[#D2F254]/80" : "border-white/75 hover:border-[#062C19]/35"} ${index === 0 ? "bg-[#062C19] text-white" : "bg-white/60 text-[#062C19]"}`}><Icon className={`mb-4 h-3.5 w-3.5 ${index === 0 ? "text-[#D2F254]" : "text-[#062C19]/45"}`} /><p className="text-2xl font-black">{value}</p><p className={`mt-1 text-[9px] font-black uppercase tracking-[0.08em] ${index === 0 ? "text-white/60" : "text-[#062C19]/45"}`}>{label}</p></motion.button>)}
+                </div>
+
+                <div className="border border-white/80 bg-white/55 p-4 backdrop-blur-md sm:p-5">
+                  <div className="mb-4 flex items-end justify-between"><div><p className="text-[10px] font-black uppercase tracking-[0.12em] text-[#062C19]/45">Your active shelf</p><p className="mt-1 text-sm font-black text-[#062C19]">Continue reading</p></div><span className="text-[10px] font-bold text-[#062C19]/40">3 books visible</span></div>
+                  <div className="space-y-2.5">{books.map((book) => <motion.button key={book.title} whileHover={{ x: 3 }} whileTap={{ scale: 0.99 }} onClick={() => handleBookClick(book.title)} className={`flex w-full items-center gap-3 border p-3 text-left transition ${selectedBook === book.title ? "border-[#062C19] bg-[#EEEBE1]/95 shadow-sm" : "border-white/80 bg-[#FBFAF7]/65 hover:border-[#062C19]/35"}`}><div className="flex h-11 w-9 shrink-0 items-end justify-center bg-[#062C19] pb-1.5 text-[8px] font-black text-[#D2F254]">BM</div><div className="min-w-0 flex-1"><p className="truncate text-xs font-black text-[#062C19]">{book.title}</p><p className="mt-0.5 truncate text-[10px] font-medium text-[#062C19]/50">{book.author}</p><span className="mt-2 inline-flex items-center gap-1 text-[9px] font-bold text-[#062C19]/45"><Tag className="h-2.5 w-2.5" /> {book.tag}</span></div><div className="hidden text-right sm:block"><StatusPill tone={book.tone}>{book.status}</StatusPill><p className="mt-1 text-[9px] font-bold text-[#062C19]/45">{book.progress} tracked</p></div></motion.button>)}</div>
+                  <AnimatePresence initial={false} mode="wait">{quickAddOpen && <motion.div initial={{ opacity: 0, height: 0, y: -8 }} animate={{ opacity: 1, height: "auto", y: 0 }} exit={{ opacity: 0, height: 0, y: -8 }} transition={{ type: "spring", stiffness: 320, damping: 28 }} className="mt-3 flex items-center gap-3 border border-dashed border-[#062C19]/25 bg-[#EEEBE1]/75 p-3"><span className="flex h-8 w-8 items-center justify-center bg-[#D2F254] text-[#062C19]"><BookOpen className="h-4 w-4" /></span><div className="flex-1"><p className="text-[10px] font-black uppercase tracking-[0.1em] text-[#062C19]/55">New book draft</p><p className="mt-0.5 text-xs font-bold text-[#062C19]">Start with a title and make it yours.</p></div><ArrowRight className="h-3.5 w-3.5 text-[#062C19]/45" /></motion.div>}{selectedBook && <motion.div key={selectedBook} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ type: "spring", stiffness: 300, damping: 26 }} className="mt-3 flex items-center justify-between border border-[#062C19]/15 bg-[#D8EBFF]/75 p-3 backdrop-blur"><div><p className="text-[10px] font-black uppercase tracking-[0.1em] text-[#0A2540]/55">Selected title</p><p className="mt-0.5 text-xs font-black text-[#0A2540]">{selectedBook}</p></div><span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#0A2540] text-white"><Check className="h-3.5 w-3.5" /></span></motion.div>}</AnimatePresence>
+                </div>
+              </div>
+
+              <aside className="space-y-4 border border-white/80 bg-white/45 p-4 backdrop-blur-md">
+                <div><p className="text-[10px] font-black uppercase tracking-[0.13em] text-[#062C19]/45">Today&apos;s goal</p><p className="mt-1 text-lg font-black text-[#062C19]">Read with intention</p></div>
+                <motion.button whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.98 }} onClick={advanceGoal} className="w-full border border-[#E2DDD0] bg-[#EEEBE1]/70 p-4 text-left"><div className="flex items-center justify-between"><span className="text-xs font-black text-[#062C19]">{goalProgress}% complete</span><span className="text-[10px] font-bold text-[#22552C]">+10 min</span></div><div className="mt-4 h-2 overflow-hidden bg-white/80"><motion.div animate={{ width: `${goalProgress}%` }} transition={{ type: "spring", stiffness: 180, damping: 22 }} className="h-full bg-[#062C19]" /></div><p className="mt-3 text-[10px] font-bold text-[#062C19]/45">Tap to log a reading session</p></motion.button>
+                <div className="border-t border-[#E2DDD0] pt-4"><p className="text-[10px] font-black uppercase tracking-[0.13em] text-[#062C19]/45">Recent activity</p><div className="mt-3 space-y-3">{["Finished a note on Atomic Habits", "Added The Creative Act", "Moved Deep Work to completed"].map((activity, index) => <motion.div key={activity} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.45 + index * 0.08 }} className="flex gap-2.5"><span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${index === 0 ? "bg-[#D2F254] ring-2 ring-[#062C19]" : "bg-[#C2CBBA]"}`} /><p className="text-[10px] font-bold leading-4 text-[#062C19]/60">{activity}</p></motion.div>)}</div></div>
+              </aside>
+            </div>
+            <motion.p key={notice} initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} className="mt-5 text-[10px] font-bold text-[#062C19]/45">{notice}</motion.p>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
 }
-
 function FeaturePreview({ index }) {
-  if (index === 0) return <div className="border border-[#E2DDD0] bg-white p-4 shadow-sm sm:p-5"><div className="flex items-center justify-between border-b border-[#E2DDD0] pb-4"><div><p className="text-[10px] font-black uppercase tracking-[0.14em] text-[#062C19]/45">Library view</p><p className="mt-1 text-sm font-black text-[#062C19]">Keep every title reachable</p></div><Search className="h-3.5 w-3.5 text-[#062C19]/45" /></div><div className="mt-4 space-y-2">{["The Psychology of Money", "The Design of Everyday Things", "Tomorrow, and Tomorrow, and Tomorrow"].map((title, itemIndex) => <div key={title} className="flex items-center gap-3 border border-[#E2DDD0]/70 bg-[#FBFAF7] p-2.5"><span className="text-[10px] font-black text-[#062C19]/35">0{itemIndex + 1}</span><div className="min-w-0 flex-1"><p className="truncate text-xs font-black text-[#062C19]">{title}</p><p className="mt-0.5 text-[10px] font-medium text-[#062C19]/50">Personal collection</p></div></div>)}</div></div>;
-  return <div className="border border-[#E2DDD0] bg-white p-4 shadow-sm sm:p-5"><div className="flex items-center justify-between border-b border-[#E2DDD0] pb-4"><div><p className="text-[10px] font-black uppercase tracking-[0.14em] text-[#062C19]/45">Reading momentum</p><p className="mt-1 text-sm font-black text-[#062C19]">Your reading rhythm</p></div><TrendingUp className="h-4 w-4 text-[#062C19]/40" /></div><div className="mt-4 grid grid-cols-[1fr_auto] gap-4"><div><p className="text-3xl font-black text-[#062C19]">12.4h</p><p className="mt-1 text-[10px] font-bold uppercase tracking-[0.1em] text-[#062C19]/45">tracked this week</p></div><span className="border border-[#C2CBBA] bg-[#C2CBBA]/55 px-3 py-2 text-xs font-black text-[#22552C]">+18.6%</span></div><div className="mt-5 flex h-28 items-end gap-1.5 border-b border-[#E2DDD0] pb-2">{[42, 64, 50, 78, 58, 94, 72].map((height, barIndex) => <span key={barIndex} style={{ height: `${height}%` }} className={`flex-1 ${barIndex === 5 ? "bg-[#062C19]" : "bg-[#C2CBBA]"}`} />)}</div><div className="mt-4 border border-[#EEEBE1] bg-[#EEEBE1]/80 p-3"><p className="text-[10px] font-black uppercase tracking-[0.1em] text-[#062C19]/45">Selected session</p><p className="mt-1 text-xs font-black text-[#062C19]">68 focused minutes</p></div></div>;
+  const [selectedTitle, setSelectedTitle] = useState("The Psychology of Money");
+  const [period, setPeriod] = useState("Week");
+  const [activeDay, setActiveDay] = useState(5);
+  const [goalDone, setGoalDone] = useState(false);
+
+  const library = [
+    { title: "The Psychology of Money", author: "Morgan Housel", tag: "Finance" },
+    { title: "The Design of Everyday Things", author: "Don Norman", tag: "Design" },
+    { title: "Tomorrow, and Tomorrow, and Tomorrow", author: "Gabrielle Zevin", tag: "Fiction" },
+  ];
+  const weeklyBars = [42, 64, 50, 78, 58, 94, 72];
+  const monthlyBars = [32, 48, 60, 52, 80, 68, 90];
+  const chartBars = period === "Week" ? weeklyBars : monthlyBars;
+  const activeMinutes = Math.round(chartBars[activeDay] * 0.72);
+
+  if (index === 0) {
+    return (
+      <div className="border border-[#E2DDD0] bg-white p-4 shadow-sm sm:p-5">
+        <div className="flex items-center justify-between border-b border-[#E2DDD0] pb-4"><div><p className="text-[10px] font-black uppercase tracking-[0.14em] text-[#062C19]/45">Library view</p><p className="mt-1 text-sm font-black text-[#062C19]">Keep every title reachable</p></div><motion.span whileHover={{ rotate: 8 }} className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#EEEBE1] text-[#062C19]"><Search className="h-3.5 w-3.5" /></motion.span></div>
+        <div className="mt-4 space-y-2">{library.map((book, itemIndex) => <motion.button key={book.title} whileHover={{ x: 3 }} whileTap={{ scale: 0.99 }} onClick={() => setSelectedTitle(book.title)} className={`flex w-full items-center gap-3 border p-2.5 text-left transition ${selectedTitle === book.title ? "border-[#062C19] bg-[#EEEBE1]" : "border-[#E2DDD0]/70 bg-[#FBFAF7] hover:border-[#062C19]/30"}`}><span className="text-[10px] font-black text-[#062C19]/35">0{itemIndex + 1}</span><div className="min-w-0 flex-1"><p className="truncate text-xs font-black text-[#062C19]">{book.title}</p><p className="mt-0.5 truncate text-[10px] font-medium text-[#062C19]/50">{book.author}</p></div><span className="hidden text-[9px] font-black uppercase tracking-[0.08em] text-[#062C19]/45 sm:block">{book.tag}</span></motion.button>)}</div>
+        <AnimatePresence mode="wait"><motion.div key={selectedTitle} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ type: "spring", stiffness: 320, damping: 26 }} className="mt-4 grid grid-cols-[1fr_auto] items-center gap-3 border border-[#D8EBFF] bg-[#D8EBFF]/65 p-3"><div><p className="text-[10px] font-black uppercase tracking-[0.1em] text-[#0A2540]/55">Selected book</p><p className="mt-1 text-xs font-black text-[#0A2540]">{selectedTitle}</p></div><span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#0A2540] text-white"><Check className="h-3.5 w-3.5" /></span></motion.div></AnimatePresence>
+      </div>
+    );
+  }
+
+  return (
+    <div className="border border-[#E2DDD0] bg-white p-4 shadow-sm sm:p-5">
+      <div className="flex items-start justify-between gap-4 border-b border-[#E2DDD0] pb-4"><div><p className="text-[10px] font-black uppercase tracking-[0.14em] text-[#062C19]/45">Reading momentum</p><p className="mt-1 text-sm font-black text-[#062C19]">Your reading rhythm</p></div><div className="flex border border-[#E2DDD0] bg-[#F7F5EE] p-0.5">{["Week", "Month"].map((option) => <motion.button key={option} whileTap={{ scale: 0.96 }} onClick={() => setPeriod(option)} className={`px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.08em] transition ${period === option ? "bg-[#062C19] text-white" : "text-[#062C19]/45"}`}>{option}</motion.button>)}</div></div>
+      <div className="mt-4 grid grid-cols-[1fr_auto] gap-4"><div><p className="text-3xl font-black tracking-tight text-[#062C19]">12.4h</p><p className="mt-1 text-[10px] font-bold uppercase tracking-[0.1em] text-[#062C19]/45">tracked this {period.toLowerCase()}</p></div><motion.div animate={{ scale: goalDone ? 1.05 : 1 }} className="border border-[#C2CBBA] bg-[#C2CBBA]/55 px-3 py-2 text-right"><p className="text-xs font-black text-[#22552C]">+18.6%</p><p className="mt-0.5 text-[9px] font-bold text-[#22552C]/70">steady growth</p></motion.div></div>
+      <div className="mt-5"><div className="flex h-28 items-end gap-1.5 border-b border-[#E2DDD0] pb-2">{chartBars.map((height, barIndex) => <motion.button key={barIndex} whileHover={{ y: -3 }} whileTap={{ scale: 0.96 }} onClick={() => setActiveDay(barIndex)} className="group flex h-full flex-1 items-end"><motion.span animate={{ height: `${height}%`, opacity: activeDay === barIndex ? 1 : 0.68 }} transition={{ type: "spring", stiffness: 190, damping: 20 }} className={`w-full ${activeDay === barIndex ? "bg-[#062C19]" : "bg-[#C2CBBA] group-hover:bg-[#062C19]/75"}`} /></motion.button>)}</div><div className="mt-2 grid grid-cols-7 text-center text-[8px] font-black uppercase tracking-[0.05em] text-[#062C19]/35">{["M", "T", "W", "T", "F", "S", "S"].map((day, dayIndex) => <span key={`${day}-${dayIndex}`} className={activeDay === dayIndex ? "text-[#062C19]" : ""}>{day}</span>)}</div></div>
+      <motion.div layout className="mt-4 border border-[#EEEBE1] bg-[#EEEBE1]/80 p-3"><div className="flex items-center justify-between"><div><p className="text-[10px] font-black uppercase tracking-[0.1em] text-[#062C19]/45">Selected session</p><p className="mt-1 text-xs font-black text-[#062C19]">{activeMinutes} focused minutes</p></div><Clock3 className="h-4 w-4 text-[#062C19]/45" /></div><motion.button whileTap={{ scale: 0.98 }} onClick={() => setGoalDone(!goalDone)} className={`mt-3 w-full border px-3 py-2 text-[10px] font-black transition ${goalDone ? "border-[#22552C] bg-[#22552C] text-white" : "border-[#062C19]/20 bg-white text-[#062C19] hover:bg-[#D2F254]"}`}>{goalDone ? "Goal logged" : "Mark today complete"}</motion.button></motion.div>
+    </div>
+  );
 }
 export default function HeroLandingPage() {
   const router = useRouter();
