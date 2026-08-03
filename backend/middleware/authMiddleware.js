@@ -1,37 +1,39 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-const protect = async (req, res, next) => {
-  let token;
+const userMiddleware = async (req, res, next) => {
+  try {
+    const { token } = req.cookies;
 
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer')
-  ) {
-    try {
-      // Get token from header
-      token = req.headers.authorization.split(' ')[1];
-
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'supersecretkey_bookmanager_12345');
-
-      // Get user from the token
-      req.user = await User.findById(decoded.id).select('-password');
-
-      if (!req.user) {
-        return res.status(401).json({ message: 'Not authorized, user not found' });
-      }
-
-      next();
-    } catch (error) {
-      console.error('JWT Auth Error:', error);
-      return res.status(401).json({ message: 'Not authorized, token failed' });
+    if (!token) {
+      throw new Error('Token is not present');
     }
-  }
 
-  if (!token) {
-    return res.status(401).json({ message: 'Not authorized, no token provided' });
+    const payload = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    );
+
+    const { _id, id } = payload;
+    const userId = _id || id;
+
+    if (!userId) {
+      throw new Error('Invalid token');
+    }
+
+    const result = await User.findById(userId).select('-password');
+
+    if (!result) {
+      throw new Error("User Doesn't Exist");
+    }
+
+    req.result = result;
+    req.user = result;
+
+    next();
+  } catch (err) {
+    res.status(401).send('Error: ' + err.message);
   }
 };
 
-module.exports = { protect };
+module.exports = { protect: userMiddleware, userMiddleware };
