@@ -1,11 +1,12 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const User = require("../models/User");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
 
 const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-
     if (!name || !email || !password) {
       throw new Error("Please add all required fields");
     }
@@ -21,14 +22,11 @@ const register = async (req, res) => {
       name,
       email: emailId,
       password: hashedPassword,
+      role: 'user',
     });
 
-    const token = jwt.sign(
-      { _id: user._id, emailId: user.email },
-      process.env.JWT_SECRET || process.env.JWT_KEY || 'secretkey',
-      { expiresIn: 60 * 60 }
-    );
-
+    const jwtSecret = process.env.JWT_KEY || process.env.JWT_SECRET || 'secretkey';
+    const token = jwt.sign({ _id: user._id, emailId: user.email, role: 'user' }, jwtSecret, { expiresIn: 60 * 60 });
     const reply = {
       name: user.name,
       email: user.email,
@@ -38,8 +36,8 @@ const register = async (req, res) => {
     res.cookie('token', token, {
       maxAge: 60 * 60 * 1000,
       httpOnly: true,
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      secure: process.env.NODE_ENV === 'production',
+      sameSite: isProduction ? 'none' : 'lax',
+      secure: isProduction,
     });
 
     res.status(201).json({
@@ -55,20 +53,17 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     if (!email || !password) {
       throw new Error("Invalid Credentials");
     }
 
     const emailId = email.toLowerCase();
     const user = await User.findOne({ email: emailId });
-
     if (!user) {
       throw new Error("Invalid Credentials");
     }
 
     const match = await bcrypt.compare(password, user.password);
-
     if (!match) {
       throw new Error("Invalid Credentials");
     }
@@ -79,17 +74,14 @@ const login = async (req, res) => {
       _id: user._id,
     };
 
-    const token = jwt.sign(
-      { _id: user._id, emailId: user.email },
-      process.env.JWT_SECRET || process.env.JWT_KEY || 'secretkey',
-      { expiresIn: 60 * 60 }
-    );
-
+    const jwtSecret = process.env.JWT_KEY || process.env.JWT_SECRET || 'secretkey';
+    const token = jwt.sign({ _id: user._id, emailId: user.email, role: user.role || 'user' }, jwtSecret, { expiresIn: 60 * 60 });
+    
     res.cookie('token', token, {
       maxAge: 60 * 60 * 1000,
       httpOnly: true,
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      secure: process.env.NODE_ENV === 'production',
+      sameSite: isProduction ? 'none' : 'lax',
+      secure: isProduction,
     });
 
     res.status(200).json({
@@ -107,8 +99,8 @@ const logout = async (req, res) => {
     res.cookie("token", null, {
       expires: new Date(Date.now()),
       httpOnly: true,
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      secure: process.env.NODE_ENV === 'production',
+      sameSite: isProduction ? 'none' : 'lax',
+      secure: isProduction,
     });
     res.send("Logged Out Succesfully");
   } catch (err) {

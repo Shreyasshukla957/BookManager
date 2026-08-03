@@ -20,10 +20,12 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await loginUser(email, password);
-      router.push("/dashboard");
+      const res = await loginUser(email, password);
+      if (res) {
+        router.push("/dashboard");
+      }
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "Failed to login");
+      setError(err.response?.data?.message || err.response?.data || err.message || "Invalid Credentials");
     } finally {
       setLoading(false);
     }
@@ -63,9 +65,9 @@ export default function LoginPage() {
           <motion.div
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold p-3 rounded-xl"
+            className="bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold p-3 rounded-xl text-center"
           >
-            {error}
+            {typeof error === "string" ? error : "Login failed. Please try again."}
           </motion.div>
         )}
 
