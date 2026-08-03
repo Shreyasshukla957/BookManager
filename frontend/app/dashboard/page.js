@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
-import Navbar from "../../components/Navbar";
-import StatsCards from "../../components/StatsCards";
-import FilterBar from "../../components/FilterBar";
-import BookCard from "../../components/BookCard";
-import BookModal from "../../components/BookModal";
-import { getMe, getBooks, logoutUser, createBook, updateBook, deleteBook } from "../../utils/api";
+import Navbar from "@/components/Navbar";
+import StatsCards from "@/components/StatsCards";
+import FilterBar from "@/components/FilterBar";
+import BookCard from "@/components/BookCard";
+import BookModal from "@/components/BookModal";
+import BookDetailModal from "@/components/BookDetailModal";
+import { getMe, getBooks, logoutUser, createBook, updateBook, deleteBook } from "@/utils/api";
 import { BookOpen } from "lucide-react";
 
 export default function DashboardPage() {
@@ -21,6 +22,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingBook, setEditingBook] = useState(null);
+  const [detailBook, setDetailBook] = useState(null);
+  const [detailBookIndex, setDetailBookIndex] = useState(0);
 
   const [formData, setFormData] = useState({
     title: "", author: "", tags: "", status: "Want to Read", notes: ""
@@ -89,6 +92,7 @@ export default function DashboardPage() {
     if (!confirm("Are you sure you want to delete this book?")) return;
     try {
       await deleteBook(id);
+      if (detailBook && detailBook._id === id) setDetailBook(null);
       fetchUserDataAndBooks(searchQuery);
     } catch (err) {
       alert("Error deleting book: " + (err.response?.data?.message || err.message));
@@ -98,6 +102,9 @@ export default function DashboardPage() {
   const handleStatusChange = async (id, newStatus) => {
     try {
       await updateBook(id, { status: newStatus });
+      if (detailBook && detailBook._id === id) {
+        setDetailBook(prev => prev ? { ...prev, status: newStatus } : null);
+      }
       fetchUserDataAndBooks(searchQuery);
     } catch (err) {
       console.error("Quick Status Change Error:", err);
@@ -172,13 +179,17 @@ export default function DashboardPage() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {books.map((book) => (
+            {books.map((book, idx) => (
               <BookCard
                 key={book._id}
                 book={book}
                 onEdit={handleOpenEditModal}
                 onDelete={handleDeleteBook}
                 onStatusChange={handleStatusChange}
+                onCardClick={(clickedBook) => {
+                  setDetailBook(clickedBook);
+                  setDetailBookIndex(idx);
+                }}
               />
             ))}
           </motion.div>
@@ -192,6 +203,15 @@ export default function DashboardPage() {
         setFormData={setFormData}
         onClose={() => setShowModal(false)}
         onSave={handleSaveBook}
+      />
+
+      <BookDetailModal
+        book={detailBook}
+        index={detailBookIndex}
+        onClose={() => setDetailBook(null)}
+        onEdit={handleOpenEditModal}
+        onDelete={handleDeleteBook}
+        onStatusChange={handleStatusChange}
       />
     </div>
   );
