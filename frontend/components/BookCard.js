@@ -17,11 +17,12 @@ export default function BookCard({ book, onEdit, onDelete, onStatusChange }) {
 
   return (
     <motion.div
-      whileHover={{ y: -4 }}
+      whileHover={{ y: -5, rotate: -0.25 }}
       transition={{ duration: 0.2 }}
-      className="bg-white border border-[#E2DDD0] rounded-2xl p-6 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-4"
+      className="group relative overflow-hidden border border-[#E2DDD0] bg-white p-5 shadow-sm transition hover:border-[#062C19]/30 hover:shadow-lg flex flex-col justify-between space-y-4"
     >
-      <div className="space-y-3">
+      <div className="absolute right-0 top-0 h-14 w-14 border-b border-l border-[#E2DDD0] bg-[#F7F5EE] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="relative space-y-3">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-extrabold text-lg text-[#062C19] leading-snug line-clamp-2">
             {book.title}
@@ -45,7 +46,7 @@ export default function BookCard({ book, onEdit, onDelete, onStatusChange }) {
 
         {book.notes && (
           <p className="text-xs text-[#062C19]/60 font-medium bg-[#F7F5EE] p-3 rounded-xl border border-[#E2DDD0]/60 italic line-clamp-3">
-            "{book.notes}"
+            &ldquo;{book.notes}&rdquo;
           </p>
         )}
       </div>

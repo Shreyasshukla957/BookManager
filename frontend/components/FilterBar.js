@@ -13,7 +13,7 @@ export default function FilterBar({
   const statuses = ["All", "Want to Read", "Reading", "Completed"];
 
   return (
-    <div className="bg-white p-4 rounded-2xl border border-[#E2DDD0] shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+    <div className="border border-[#E2DDD0] bg-white/80 p-3 shadow-sm backdrop-blur-sm flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
       {/* Search Input with Search Button */}
       <form onSubmit={onSearchSubmit} className="flex items-center space-x-2 w-full md:w-auto flex-1 max-w-md">
         <div className="relative w-full">
@@ -22,13 +22,13 @@ export default function FilterBar({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by title or author..."
-            className="w-full bg-[#F7F5EE] border border-[#E2DDD0] text-xs font-medium text-[#062C19] rounded-xl pl-9 pr-4 py-2.5 focus:outline-none focus:border-[#062C19] transition"
+            className="w-full bg-[#F7F5EE] border border-[#E2DDD0] text-xs font-medium text-[#062C19] pl-9 pr-4 py-2.5 focus:outline-none focus:border-[#062C19] transition"
           />
           <Search className="w-4 h-4 text-[#062C19]/40 absolute left-3 top-3" />
         </div>
         <button
           type="submit"
-          className="px-4 py-2.5 bg-[#062C19] text-white text-xs font-bold rounded-xl hover:bg-[#0a4227] transition shrink-0 cursor-pointer"
+          className="px-4 py-2.5 bg-[#062C19] text-white text-xs font-bold hover:bg-[#0a4227] transition shrink-0 cursor-pointer"
         >
           Search
         </button>
@@ -36,7 +36,7 @@ export default function FilterBar({
 
       {/* Filter Status Pills & Add Book Button */}
       <div className="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
-        <div className="flex items-center space-x-1 bg-[#F7F5EE] p-1 rounded-xl border border-[#E2DDD0]">
+        <div className="flex items-center space-x-1 bg-[#F7F5EE] p-1 border border-[#E2DDD0]">
           {statuses.map((status) => {
             const isSelected =
               status === "All" ? selectedStatus === "" : selectedStatus === status;
